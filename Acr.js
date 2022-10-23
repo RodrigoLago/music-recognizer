@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react'
 import { Button, View, Text } from 'react-native';
 import { Audio } from 'expo-av';
 import { FileSystem, Permissions } from 'react-native-unimodules';
@@ -8,14 +8,26 @@ import { FileSystem, Permissions } from 'react-native-unimodules';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
 //import Base64 from 'crypto-js/enc-base64';
 var CryptoJS = require("crypto-js");
+import { Response } from './Response.js';
 import { Buffer } from 'buffer';
 
 export default class MusicRec_Test extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { response: '' };
+        this.state = { 
+            response: '',
+            myText: 'Music Recognizer',
+        };
+        this._updateText = this._updateText.bind(this);
     }
-    async _findSong() {
+    _updateText = (data) => {
+        console.log("DATA :"+data)
+        //console.log("DATA METADATA:"+JSON.parse(data.metadata))
+        data = JSON.parse(data)
+        //let response =  JSON.stringify(data.metadata)
+        this.setState({myText: JSON.stringify(data)})
+    }
+    async _findSong(callback) {
         // Audio.setAudioModeAsync()
         const { status } = await Audio.requestPermissionsAsync();
         console.log('Current Status ' + status);
@@ -52,9 +64,13 @@ export default class MusicRec_Test extends React.Component {
             await recording.stopAndUnloadAsync();
             let recordingFile = recording.getURI();
 
-            let result = await identify(recordingFile, defaultOptions);
+            let result = await identify(recordingFile, defaultOptions)
+            //.then((result) => console.log(result))
+            .then(response => callback(response))
+            
+            //this.setState({myText: 'My Changed Text'})
             console.log(result);
-            //return result;
+            return result;
         } catch (error) {
             console.log(error);
             console.log('Error in this!!!!');
@@ -62,9 +78,9 @@ export default class MusicRec_Test extends React.Component {
     }
     render() {
         return (
-            <View >
-                <Button title="Find Song" onPress={this._findSong} />
-                <Text />
+            <View>
+                <Text > {this.state.myText} </Text>
+                <Button title="Find Song" color="#841584" onPress={() => this._findSong(this._updateText)} />
             </View>
         );
     }
@@ -136,6 +152,6 @@ async function identify(uri, options) {
         postOptions,
     );
     let result = await response.text();
-    console.log(result);
+    //console.log(result);
     return result;
 }
