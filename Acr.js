@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Button, View, Text } from 'react-native';
+import { StyleSheet, Button, View, Text } from 'react-native';
 import { Audio } from 'expo-av';
 import { FileSystem, Permissions } from 'react-native-unimodules';
 //import hmacSHA1 from 'crypto-js/hmac-sha1';
@@ -10,24 +10,36 @@ import hmacSHA1 from 'crypto-js/hmac-sha1';
 var CryptoJS = require("crypto-js");
 import { Response } from './Response.js';
 import { Buffer } from 'buffer';
+import { style } from 'deprecated-react-native-prop-types/DeprecatedImagePropType.js';
 
 export default class MusicRec_Test extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { 
+        this.state = {
             response: '',
             myText: 'Music Recognizer',
         };
         this._updateText = this._updateText.bind(this);
     }
     _updateText = (data) => {
-        console.log("DATA :"+data)
-        //console.log("DATA METADATA:"+JSON.parse(data.metadata))
-        data = JSON.parse(data)
-        //let response =  JSON.stringify(data.metadata)
-        this.setState({myText: JSON.stringify(data)})
+        if (data.status.code != 0) {
+            this.setState({ myText: 'No se encontró la canción' })
+        }
+        else {
+            let title = data.metadata.music[0].title // listo
+            let album = data.metadata.music[0].album.name // listo
+            let artist = data.metadata.music[0].artists[0].name //listo
+            let processTime = data.cost_time
+            processTime.toString()
+            console.log(title + album + artist)
+            let text = `Artista: ${artist}\nTitle: ${title}\nAlbum: ${album}\nTiempo en procesar: ${processTime}`
+            //let artista = data.metadata.music[0].artist.name
+            this.setState({ myText: text })
+        }
+
     }
     async _findSong(callback) {
+        this.setState({ myText: 'Procesando...' })
         // Audio.setAudioModeAsync()
         const { status } = await Audio.requestPermissionsAsync();
         console.log('Current Status ' + status);
@@ -65,11 +77,11 @@ export default class MusicRec_Test extends React.Component {
             let recordingFile = recording.getURI();
 
             let result = await identify(recordingFile, defaultOptions)
-            //.then((result) => console.log(result))
-            .then(response => callback(response))
-            
-            //this.setState({myText: 'My Changed Text'})
-            console.log(result);
+                //.then((result) => console.log(result))
+                //.then((json) => callback(json))
+                //.then((json) => this.setState({ myText: JSON.stringify(json.status) }))
+                .then((json) => callback(json))
+
             return result;
         } catch (error) {
             console.log(error);
@@ -79,9 +91,9 @@ export default class MusicRec_Test extends React.Component {
     render() {
         return (
             <View>
-                <Text > {this.state.myText} </Text>
-                <Button title="Find Song" color="#841584" onPress={() => this._findSong(this._updateText)} />
-            </View>
+                <Text style={styles.txt}> {this.state.myText} </Text>
+                <Button style={styles.btn} background-color='#fff' title="Find Song" color="#ffff" onPress={() => this._findSong(this._updateText)} />
+            </View >
         );
     }
 }
@@ -151,7 +163,28 @@ async function identify(uri, options) {
         'http://' + options.host + options.endpoint,
         postOptions,
     );
-    let result = await response.text();
+    let result = await response.json();
     //console.log(result);
     return result;
 }
+function isJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
+const styles = StyleSheet.create({
+    btn: {
+        flex: 1,
+        width: '100%',
+        fontSize: 20,
+        fontWeight: "bold",
+        backgroundColor: '#000000',
+    },
+    txt: {
+        color: '#fff'
+    }
+});
