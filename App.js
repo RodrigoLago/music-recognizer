@@ -8,7 +8,7 @@ export default function App() {
     <View style={styles.container}>
       <LinearGradient
         // Button Linear Gradient
-        colors={['#420047', '#7e0046']}
+        colors={['#02aab0', '#420047']}
         style={styles.background}>
         <StatusBar style="auto" />
         <MusicRec_Test />

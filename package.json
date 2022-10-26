@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@expo/webpack-config": "^0.17.0",
+    "@rneui/base": "^0.0.0-edge.2",
+    "@rneui/themed": "^0.0.0-edge.2",
     "crypto-js": "^4.1.1",
     "deprecated-react-native-prop-types": "^2.3.0",
     "expo": "~46.0.16",

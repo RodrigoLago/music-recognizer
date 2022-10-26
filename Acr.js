@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { StyleSheet, Button, View, Text } from 'react-native';
+import { Button, StyleSheet, View, Text } from 'react-native';
 import { Audio } from 'expo-av';
 import { FileSystem, Permissions } from 'react-native-unimodules';
 //import hmacSHA1 from 'crypto-js/hmac-sha1';
@@ -18,10 +18,12 @@ export default class MusicRec_Test extends React.Component {
         this.state = {
             response: '',
             myText: 'Music Recognizer',
+            loading: 'false'
         };
         this._updateText = this._updateText.bind(this);
     }
     _updateText = (data) => {
+        console.log(data)
         if (data.status.code != 0) {
             this.setState({ myText: 'No se encontró la canción' })
         }
@@ -30,16 +32,17 @@ export default class MusicRec_Test extends React.Component {
             let album = data.metadata.music[0].album.name // listo
             let artist = data.metadata.music[0].artists[0].name //listo
             let processTime = data.cost_time
+            processTime = roundNumber(processTime, 3);
             processTime.toString()
             console.log(title + album + artist)
-            let text = `Artista: ${artist}\nTitle: ${title}\nAlbum: ${album}\nTiempo en procesar: ${processTime}`
+            let text = `Artist: ${artist}\n Title: ${title}\n Album: ${album}\n Cost Time: ${processTime}s`
             //let artista = data.metadata.music[0].artist.name
             this.setState({ myText: text })
         }
 
     }
     async _findSong(callback) {
-        this.setState({ myText: 'Procesando...' })
+        this.setState({ myText: 'Processing...' })
         // Audio.setAudioModeAsync()
         const { status } = await Audio.requestPermissionsAsync();
         console.log('Current Status ' + status);
@@ -90,9 +93,11 @@ export default class MusicRec_Test extends React.Component {
     }
     render() {
         return (
-            <View>
-                <Text style={styles.txt}> {this.state.myText} </Text>
-                <Button style={styles.btn} background-color='#fff' title="Find Song" color="#ffff" onPress={() => this._findSong(this._updateText)} />
+            <View style={styles.view}>
+                <Text style={styles.txt}> {this.state.myText}</Text>
+                <View style={styles.btndv}>
+                    <Button style={styles.btn} title="Find Song" type="solid" color="#ffff" onPress={() => this._findSong(this._updateText)} />
+                </View>
             </View >
         );
     }
@@ -175,16 +180,40 @@ function isJsonString(str) {
     }
     return true;
 }
-
+function roundNumber(num, scale) {
+    if (!("" + num).includes("e")) {
+        return +(Math.round(num + "e+" + scale) + "e-" + scale);
+    } else {
+        var arr = ("" + num).split("e");
+        var sig = ""
+        if (+arr[1] + scale > 0) {
+            sig = "+";
+        }
+        return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
+    }
+}
 const styles = StyleSheet.create({
     btn: {
-        flex: 1,
+
+        color: '#ffff',
         width: '100%',
-        fontSize: 20,
-        fontWeight: "bold",
-        backgroundColor: '#000000',
+    },
+    btndv: {
+
+        borderRadius: 70,
+        margin: '10%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        backgroundColor: '#000428',
+    },
+    view: {
+
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     txt: {
+        fontSize: 20,
         color: '#fff'
     }
 });
