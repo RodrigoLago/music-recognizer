@@ -96,7 +96,7 @@ export default class MusicRec_Test extends React.Component {
             <View style={styles.view}>
                 <Text style={styles.txt}> {this.state.myText}</Text>
                 <View style={styles.btndv}>
-                    <Button style={styles.btn} title="Find Song" type="solid" color="#ffff" onPress={() => this._findSong(this._updateText)} />
+                    <Button style={styles.btn} title="Find Song" type="solid" color="#7c1a38" onPress={() => this._findSong(this._updateText)} />
                 </View>
             </View >
         );
@@ -194,21 +194,17 @@ function roundNumber(num, scale) {
 }
 const styles = StyleSheet.create({
     btn: {
-
-        color: '#ffff',
         width: '100%',
+        borderRadius: 70,
+
     },
     btndv: {
-
-        borderRadius: 70,
         margin: '10%',
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
-        backgroundColor: '#000428',
     },
     view: {
-
         alignItems: 'center',
         justifyContent: 'center',
     },
