@@ -6,7 +6,7 @@ import { roundNumber } from '../utils/roundNumber';
 import { acrPost } from '../api/services/acrPost';
 import { defaultOptions } from '../config/defaultOptions';
 
-const MusicRecTest = () => {
+const MusicRec = () => {
     const [myText, setMyText] = useState('Music Recognizer');
     const [response, setResponse] = useState('');
     const [loading, setLoading] = useState(false);
@@ -41,6 +41,7 @@ const MusicRecTest = () => {
 
         const { status } = await Audio.requestPermissionsAsync();
         console.log('Current Status ' + status);
+        
         const recording = new Audio.Recording();
         try {
             await Audio.setAudioModeAsync({
@@ -108,7 +109,7 @@ const MusicRecTest = () => {
     );
 }
 
-export default MusicRecTest;
+export default MusicRec;
 
 const styles = StyleSheet.create({
     btn: {
