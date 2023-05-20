@@ -1,16 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React from 'react'
 import { Button, StyleSheet, View, Text } from 'react-native';
 import { Audio } from 'expo-av';
-import { FileSystem, Permissions } from 'react-native-unimodules';
-//import hmacSHA1 from 'crypto-js/hmac-sha1';
-//import { hmacSHA1 } from 'hmacsha1'
-//var hmacSHA1 = require("hmacsha1");
+import { FileSystem } from 'react-native-unimodules';
 import hmacSHA1 from 'crypto-js/hmac-sha1';
-//import Base64 from 'crypto-js/enc-base64';
 var CryptoJS = require("crypto-js");
-import { Response } from './Response.js';
-import { Buffer } from 'buffer';
-import { style } from 'deprecated-react-native-prop-types/DeprecatedImagePropType.js';
 
 export default class MusicRec_Test extends React.Component {
     constructor(props) {
@@ -111,8 +104,8 @@ const defaultOptions = {
     signature_version: '1',
     data_type: 'audio',
     secure: true,
-    access_key: 'c00f954c13716ac155e0b995802c1d34',
-    access_secret: 'kYaFzOUBKFbLkzqnPKG5otYB0UPo3fXQyYgUA7Jy',
+    access_key: '018707c3fb7c6e5c0d0896ebea400107',
+    access_secret: 'paoHmtERn4lCY3my9Iw1TrvVSdrdoiTlamnRajMr',
 };
 function buildStringToSign(
     method,
@@ -172,14 +165,7 @@ async function identify(uri, options) {
     //console.log(result);
     return result;
 }
-function isJsonString(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
+
 function roundNumber(num, scale) {
     if (!("" + num).includes("e")) {
         return +(Math.round(num + "e+" + scale) + "e-" + scale);
