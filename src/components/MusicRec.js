@@ -1,24 +1,24 @@
-import React from 'react'
-import { Button, StyleSheet, View, Text } from 'react-native';
+import React, {useState, useEffect} from 'react'
+import { Button, StyleSheet, View, Text, Row, Spinner } from 'react-native';
 import { Audio } from 'expo-av';
-import { FileSystem } from 'react-native-unimodules';
-import hmacSHA1 from 'crypto-js/hmac-sha1';
-var CryptoJS = require("crypto-js");
+import { timeout } from '../utils/timeout';
+import { roundNumber } from '../utils/roundNumber';
+import { acrPost } from '../api/services/acrPost';
+import { defaultOptions } from '../config/defaultOptions';
 
-export default class MusicRec_Test extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            response: '',
-            myText: 'Music Recognizer',
-            loading: 'false'
-        };
-        this._updateText = this._updateText.bind(this);
-    }
-    _updateText = (data) => {
+const MusicRecTest = () => {
+    const [myText, setMyText] = useState('Music Recognizer');
+    const [response, setResponse] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+
+      },[]);
+
+    const _updateText = (data) => {
         console.log(data)
         if (data.status.code != 0) {
-            this.setState({ myText: 'No se encontró la canción' })
+            setMyText('No se encontró la canción')
         }
         else {
             let title = data.metadata.music[0].title // listo
@@ -30,13 +30,15 @@ export default class MusicRec_Test extends React.Component {
             console.log(title + album + artist)
             let text = `Artist: ${artist}\n Title: ${title}\n Album: ${album}\n Cost Time: ${processTime}s`
             //let artista = data.metadata.music[0].artist.name
-            this.setState({ myText: text })
+            setMyText(text)
         }
-
     }
-    async _findSong(callback) {
-        this.setState({ myText: 'Processing...' })
-        // Audio.setAudioModeAsync()
+
+    const _findSong = async (callback) => 
+    {
+        setMyText('Processing...')
+        setLoading(true)
+
         const { status } = await Audio.requestPermissionsAsync();
         console.log('Current Status ' + status);
         const recording = new Audio.Recording();
@@ -72,112 +74,42 @@ export default class MusicRec_Test extends React.Component {
             await recording.stopAndUnloadAsync();
             let recordingFile = recording.getURI();
 
-            let result = await identify(recordingFile, defaultOptions)
+            let result = await acrPost(recordingFile, defaultOptions)
                 //.then((result) => console.log(result))
                 //.then((json) => callback(json))
                 //.then((json) => this.setState({ myText: JSON.stringify(json.status) }))
                 .then((json) => callback(json))
 
+            
+            setLoading(false)
             return result;
         } catch (error) {
             console.log(error);
             console.log('Error in this!!!!');
         }
+
     }
-    render() {
-        return (
+
+    return (
+        <React.Fragment>
+            {loading ? 
+                <Text className='justify-content-md-center'>
+                Buscando info (spinner)
+                </Text>
+            : 
+                <Text style={styles.txt}> {myText}</Text>
+            }
             <View style={styles.view}>
-                <Text style={styles.txt}> {this.state.myText}</Text>
                 <View style={styles.btndv}>
-                    <Button style={styles.btn} title="Find Song" type="solid" color="#7c1a38" onPress={() => this._findSong(this._updateText)} />
+                    <Button style={styles.btn} title="Find Song" type="solid" color="#7c1a38" onPress={() => _findSong(_updateText)} />
                 </View>
             </View >
-        );
-    }
-}
-function timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-const defaultOptions = {
-    host: 'identify-eu-west-1.acrcloud.com',
-    endpoint: '/v1/identify',
-    signature_version: '1',
-    data_type: 'audio',
-    secure: true,
-    access_key: '018707c3fb7c6e5c0d0896ebea400107',
-    access_secret: 'paoHmtERn4lCY3my9Iw1TrvVSdrdoiTlamnRajMr',
-};
-function buildStringToSign(
-    method,
-    uri,
-    accessKey,
-    dataType,
-    signatureVersion,
-    timestamp,
-) {
-    return [method, uri, accessKey, dataType, signatureVersion, timestamp].join(
-        '\n',
+        </React.Fragment>
     );
-}
-function signString(stringToSign, accessSecret) {
-    return CryptoJS.enc.Base64.stringify(hmacSHA1(stringToSign, accessSecret))
-}
-async function identify(uri, options) {
-    var current_data = new Date();
-    var timestamp = current_data.getTime() / 1000;
-    var stringToSign = buildStringToSign(
-        'POST',
-        options.endpoint,
-        options.access_key,
-        options.data_type,
-        options.signature_version,
-        timestamp,
-    );
-    let fileinfo = await FileSystem.getInfoAsync(uri, { size: true });
-    var signature = signString(stringToSign, options.access_secret);
-    var formData = {
-        sample: { uri: uri, name: 'sample.wav', type: 'audio/wav' },
-        access_key: options.access_key,
-        data_type: options.data_type,
-        signature_version: options.signature_version,
-        signature: signature,
-        sample_bytes: fileinfo.size,
-        timestamp: timestamp,
-    };
-    var form = new FormData();
-    for (let key in formData) {
-        form.append(key, formData[key]);
-    }
-
-    let postOptions = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-        body: form,
-    };
-    console.log(postOptions.body);
-    let response = await fetch(
-        'http://' + options.host + options.endpoint,
-        postOptions,
-    );
-    let result = await response.json();
-    //console.log(result);
-    return result;
 }
 
-function roundNumber(num, scale) {
-    if (!("" + num).includes("e")) {
-        return +(Math.round(num + "e+" + scale) + "e-" + scale);
-    } else {
-        var arr = ("" + num).split("e");
-        var sig = ""
-        if (+arr[1] + scale > 0) {
-            sig = "+";
-        }
-        return +(Math.round(+arr[0] + "e" + sig + (+arr[1] + scale)) + "e-" + scale);
-    }
-}
+export default MusicRecTest;
+
 const styles = StyleSheet.create({
     btn: {
         width: '100%',
