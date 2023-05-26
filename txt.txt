@@ -1,0 +1,14 @@
+SDK
+    https://docs.expo.dev/versions/latest/sdk/audio/
+
+npm install react-native-pitch-detector 
+    https://www.npmjs.com/package/react-native-pitch-detector
+
+Web Audio API
+    https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API
+
+stackoverflow
+    https://stackoverflow.com/questions/69237143/how-do-i-get-the-audio-frequency-from-my-mic-using-javascript
+
+https://es.legacy.reactjs.org/docs/hooks-effect.html 
+
