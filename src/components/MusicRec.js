@@ -11,10 +11,6 @@ const MusicRec = () => {
     const [response, setResponse] = useState('');
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-
-      },[]);
-
     const _updateText = (data) => {
         console.log(data)
         if (data.status.code != 0) {
