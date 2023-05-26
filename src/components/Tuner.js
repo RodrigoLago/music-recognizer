@@ -48,7 +48,6 @@ const Tuner = () => {
 
             recording.setOnRecordingStatusUpdate((status) => {
                 console.log(status);
-
             });
 
             await timeout(5000);

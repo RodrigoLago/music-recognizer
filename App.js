@@ -12,8 +12,8 @@ export default function App() {
         colors={['#00cdac', '#02aab0', '#cc2b5e']}
         style={styles.background}>
         <StatusBar style="auto" />
-        <MusicRec />
-        <Tuner/>
+          <MusicRec />
+          <Tuner/>
       </LinearGradient>
 
     </View>
