@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import MusicRec_Test from "./Acr.js"
+import { StyleSheet, View } from 'react-native';
+import MusicRec from "./src/components/MusicRec.js"
 import { LinearGradient } from 'expo-linear-gradient';
+import Tuner from "./src/components/Tuner.js"
 
 export default function App() {
   return (
@@ -11,7 +12,8 @@ export default function App() {
         colors={['#00cdac', '#02aab0', '#cc2b5e']}
         style={styles.background}>
         <StatusBar style="auto" />
-        <MusicRec_Test />
+          <MusicRec />
+          <Tuner/>
       </LinearGradient>
 
     </View>
